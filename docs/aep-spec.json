@@ -1,0 +1,937 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Alliance Exchange Pipeline",
+    "description": "The Alliance Exchange Pipeline (AEP) is as REST based API used for exchanging events between Tyler Alliance clients. Use cases for AEP include data and workflow integration between Tyler systems. \n\nThe API defines a new Message endpoint, which can be used to send and receive messages. Messages are sent using an envelope. Envelopes consists of pre-defined events which act upon entities. For a full list of events and entities, please see this link `PLACEHOLDER`.\n\nAuthentication is managed through an OAuth 2.0 client credentials flow. Details on how to authenticate to the API via OAuth can be found below.\n",
+    "contact": {
+      "name": "Tyler Technologies"
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.dev.tyleralliance.com/exchange",
+      "description": "dev"
+    }
+  ],
+  "security": [
+    {
+      "OAuthAuthorizer": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Messages",
+      "description": "Endpoints to manage messages on the Alliance Exchange Platform."
+    },
+    {
+      "name": "Trace",
+      "description": "Endpoints to trace envelopes on the Alliance Exchange Platform."
+    }
+  ],
+  "paths": {
+    "/Messages": {
+      "get": {
+        "tags": [
+          "Messages"
+        ],
+        "summary": "Get Messages",
+        "description": "Retrieves up to 10 messages",
+        "operationId": "getMessages",
+        "parameters": [
+          {
+            "name": "MaxNumberOfMessages",
+            "in": "header",
+            "description": "Max Number of Messages to Attempt to Retrieve from the Queue",
+            "required": false,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "number",
+              "example": 5
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Messages Retrieved Successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_401"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_500"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuthAuthorizer": []
+          }
+        ],
+        "x-amazon-apigateway-request-validator": "Validate body, query string parameters, and headers",
+        "x-amazon-apigateway-integration": {
+          "uri": {
+            "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetMessage.Arn}/invocations"
+          },
+          "httpMethod": "POST",
+          "type": "aws_proxy"
+        }
+      },
+      "put": {
+        "tags": [
+          "Messages"
+        ],
+        "summary": "Put Message",
+        "description": "Publishes a Message to the Alliance Exchange Platform",
+        "operationId": "putMessage",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Messages_body"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Message Published Successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/putMessageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_401"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_500"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuthAuthorizer": []
+          }
+        ],
+        "x-amazon-apigateway-request-validator": "Validate body, query string parameters, and headers",
+        "x-amazon-apigateway-integration": {
+          "uri": {
+            "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:states:action/StartExecution"
+          },
+          "httpMethod": "POST",
+          "type": "aws",
+          "credentials": {
+            "Fn::GetAtt": [
+              "APIGatewayToStepFunctionRole",
+              "Arn"
+            ]
+          },
+          "requestTemplates": {
+            "application/json": {
+              "Fn::Sub": "#set($body = $input.path('$'))\n#set($body.System = $context.authorizer.systemId)\n#set($body.Source = $context.authorizer.systemId)\n#set($body.OriginalTimestamp = $context.requestTimeEpoch)\n#set($body.EnvelopeId = $context.requestId)\n#set($body.CodeSet = $context.authorizer.appCodeSetId)\n#set($body.AppClientId = $context.authorizer.sub)\n#if(\"$!body.ResolveMappings\" == \"\")\n  #set($body.ResolveMappings = true)\n#end\n#if(\"$!body.ValidateEnvelope\" == \"\")\n  #set($body.ValidateEnvelope = true)\n#end\n#if($body.PartnerId.isEmpty())\n  #set($body.Partner = \"SystemWide\")\n#else\n  #set($body.Partner = \"$body.PartnerId\")\n#end\n#if($body.TraceData.isEmpty())\n  #set($body.TraceData = {})\n#end\n#if($body.TriggeredBy.isEmpty())\n  #set($body.TriggeredBy = \"UNKNOWN\")\n#end\n#set($targetSetId = $context.authorizer.cloudCodeSetId)\n#set($payload = $util.escapeJavaScript($input.json('$')).replaceAll(\"\\\\'\",\"'\"))\n{\n    \"input\": \"{ \\\"Envelope\\\": $payload }\",\n    \"stateMachineArn\": \"${PreProcessingPipelineStateMachine.Arn}\"\n}"
+            }
+          },
+          "responses": {
+            "200": {
+              "statusCode": "200",
+              "responseTemplates": {
+                "application/json": {
+                  "Fn::Sub": "#set($inputRoot = $input.path('$'))\n{\n  \"status\":\"SUCCESS\",\n  \"EnvelopeId\": \"$context.requestId\"\n}"
+                }
+              }
+            },
+            "default": {
+              "statusCode": "500",
+              "responseTemplates": {
+                "application/json": {
+                  "Fn::Sub": "#set($message = $input.path('$.message'))\n{\n  \"message\": \"$message\"\n}"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Messages"
+        ],
+        "summary": "Delete Message",
+        "description": "Deletes a Message",
+        "operationId": "deleteMessage",
+        "parameters": [
+          {
+            "name": "ReceiptHandle",
+            "in": "header",
+            "description": "Receipt Handle of a Message",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string",
+              "example": "AQEBSmNznZBtkFdjiT/SFfSljPcdYyhc3jLlLb/4YKLgI9DX3dOXSocD/NOoattbRRbgS6NQv3Wbem9Fm/47wrAI1LTqSOsz="
+            }
+          },
+          {
+            "name": "EnvelopeId",
+            "in": "header",
+            "description": "ID of an Alliance Envelope",
+            "required": false,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string",
+              "example": "e3de0faf-d4bc-4bb3-b2a7-f9853f500dec"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Message Deleted Successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/deleteMessageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_401"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_500"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuthAuthorizer": []
+          }
+        ],
+        "x-amazon-apigateway-request-validator": "Validate body, query string parameters, and headers",
+        "x-amazon-apigateway-integration": {
+          "uri": {
+            "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${DeleteMessage.Arn}/invocations"
+          },
+          "httpMethod": "POST",
+          "type": "aws_proxy"
+        }
+      }
+    },
+    "/Trace": {
+      "post": {
+        "tags": [
+          "Trace"
+        ],
+        "summary": "Add a Trace",
+        "description": "Add a Trace for an Envelope",
+        "operationId": "addTrace",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/traceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Trace added successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/traceResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_400"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_401"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "An error occurred when adding the trace.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/traceErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuthAuthorizer": []
+          }
+        ],
+        "x-amazon-apigateway-request-validator": "Validate body, query string parameters, and headers",
+        "x-amazon-apigateway-integration": {
+          "uri": {
+            "Fn::Sub": "arn:${AWS::Partition}:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AddTraceFunction.Arn}/invocations"
+          },
+          "httpMethod": "POST",
+          "type": "aws_proxy"
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "traceRequest": {
+        "type": "object",
+        "properties": {
+          "Partner": {
+            "type": "string",
+            "example": "100"
+          },
+          "Timestamp": {
+            "type": "string",
+            "example": "3/22/2022 3:17:54 PM"
+          },
+          "EventType": {
+            "type": "string",
+            "example": "parentadd"
+          },
+          "Entities": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/traceRequest_Entities"
+            }
+          },
+          "TraceData": {
+            "type": "object",
+            "example": {
+              "CaseNumber": "22CR00415"
+            }
+          },
+          "EnvelopeId": {
+            "type": "string",
+            "example": "b4dc0359-c8f9-45c2-b76f-3bb3b44ca6ef"
+          },
+          "ErrorStream": {
+            "type": "string",
+            "example": "<StackTrace>"
+          },
+          "Message": {
+            "type": "string",
+            "example": "NullPointerException"
+          },
+          "Method": {
+            "type": "string",
+            "example": "Tyler.Alliance.DataSharing.Inbound.AllianceDataSharing.Handler"
+          },
+          "Stage": {
+            "type": "string",
+            "example": "InboundHandler"
+          }
+        },
+        "description": "Object describing the trace"
+      },
+      "traceResponse": {
+        "type": "object",
+        "properties": {
+          "Status": {
+            "type": "string",
+            "example": "Success"
+          },
+          "Message": {
+            "type": "string",
+            "example": "Trace added successfully"
+          }
+        },
+        "description": "Trace Success Message"
+      },
+      "traceErrorResponse": {
+        "type": "object",
+        "properties": {
+          "Status": {
+            "type": "string",
+            "example": "Error"
+          },
+          "ErrorMessage": {
+            "type": "string",
+            "example": "Unable to add trace - <Error>"
+          }
+        },
+        "description": "Trace Error Message"
+      },
+      "deleteMessageResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "SUCCESS"
+          }
+        }
+      },
+      "envelopeOptions": {
+        "type": "object",
+        "properties": {
+          "TriggeredBy": {
+            "type": "string",
+            "description": "The user or entity that triggered the message.",
+            "example": "jane.doe@example.com"
+          },
+          "PartnerId": {
+            "type": "string",
+            "description": "The logical partner identifier. Used for envelope routing.",
+            "example": "1000",
+            "default": "SystemWide"
+          },
+          "PartnerIds": {
+            "maxItems": 20,
+            "minItems": 1,
+            "type": "array",
+            "description": "Used to represent a hierarchy of partners. The pipeline will iterate over the list until a routable partner is found.",
+            "example": [
+              "1000",
+              "110",
+              "1"
+            ],
+            "items": {
+              "type": "string",
+              "example": "1000"
+            }
+          },
+          "ResolveMappings": {
+            "type": "boolean",
+            "description": "Flag to enable/disable code mapping.",
+            "example": true,
+            "default": true
+          },
+          "ValidateEnvelope": {
+            "type": "boolean",
+            "description": "Flag to enable/disable validation.",
+            "example": true,
+            "default": true
+          }
+        }
+      },
+      "envelopeMetadata": {
+        "type": "object",
+        "properties": {
+          "System": {
+            "type": "string",
+            "description": "Identifier of the consuming system.",
+            "example": "abcd1234"
+          },
+          "Source": {
+            "type": "string",
+            "description": "Identifier of the publishing system.",
+            "example": "abcd1234"
+          },
+          "OriginalTimestamp": {
+            "type": "number",
+            "example": 1675101651776
+          },
+          "EnvelopeId": {
+            "type": "string",
+            "example": "42d82fae-58b8-476c-8836-8c1029b977b7"
+          },
+          "CodeSet": {
+            "type": "string",
+            "description": "Identifier of the applied code set.",
+            "example": "eif02340987asd"
+          },
+          "AppClientId": {
+            "type": "string",
+            "description": "Publishing system client identifier.",
+            "example": "j3if9a07sd8f72"
+          },
+          "Partner": {
+            "type": "string",
+            "description": "Resolved partner for routing.",
+            "example": "110"
+          },
+          "InternalPartnerId": {
+            "type": "string",
+            "example": "asdf7c098w7era"
+          },
+          "ReceiptHandle": {
+            "type": "string",
+            "example": "AQEBSmNznZBtkFdjiT/SFfSljPcdYyhc3jLlLb/4YKLgI9DX3dOXSocD/NOoattbRRbgS6NQv3Wbem9Fm/47wrAI1LTqSOsz="
+          },
+          "TraceData": {
+            "type": "object",
+            "example": {
+              "CaseNumber": "22CR000483"
+            }
+          },
+          "EventType": {
+            "type": "string",
+            "example": "dachargeadd"
+          }
+        }
+      },
+      "eventBase": {
+        "required": [
+          "Entities",
+          "EventType"
+        ],
+        "type": "object",
+        "properties": {
+          "EventType": {
+            "type": "string",
+            "example": "dachargeadd"
+          },
+          "Entities": {
+            "maxItems": 50,
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/entityBase"
+            }
+          },
+          "TraceData": {
+            "type": "object",
+            "example": {
+              "CaseNumber": "22CR000483"
+            }
+          }
+        }
+      },
+      "eventDetail": {
+        "required": [
+          "Entities",
+          "EventType"
+        ],
+        "type": "object",
+        "properties": {
+          "EventType": {
+            "type": "string",
+            "example": "dachargeadd"
+          },
+          "Entities": {
+            "maxItems": 50,
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/entityDetail"
+            }
+          },
+          "TraceData": {
+            "type": "object",
+            "example": {
+              "CaseNumber": "22CR000483"
+            }
+          }
+        }
+      },
+      "entityBase": {
+        "required": [
+          "EntityId",
+          "EntityType",
+          "LinkEntity"
+        ],
+        "type": "object",
+        "properties": {
+          "EntityId": {
+            "type": "string",
+            "example": "15624"
+          },
+          "EntityType": {
+            "type": "string",
+            "example": "person"
+          },
+          "LinkEntity": {
+            "type": "boolean",
+            "description": "Flag to enable/disable linking.",
+            "example": true,
+            "default": false
+          },
+          "UpdateData": {
+            "type": "boolean",
+            "description": "Flag to enable/disable persisting of entity data.",
+            "example": false,
+            "default": true
+          },
+          "ValidateEntity": {
+            "type": "boolean",
+            "description": "Flag to enable/disable entity validation.",
+            "example": false,
+            "default": true
+          },
+          "EntityData": {
+            "type": "object",
+            "example": {}
+          }
+        }
+      },
+      "entityPipelineMetadata": {
+        "type": "object",
+        "properties": {
+          "CloudId": {
+            "type": "string",
+            "example": "36265bb4-8035-4745-a789-7211193c30eb"
+          },
+          "LinkedEntityIds": {
+            "minItems": 0,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/entityPipelineMetadata_LinkedEntityIds"
+            }
+          }
+        }
+      },
+      "entityDetail": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/entityBase"
+          },
+          {
+            "$ref": "#/components/schemas/entityPipelineMetadata"
+          }
+        ]
+      },
+      "putMessage": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/envelopeOptions"
+          },
+          {
+            "required": [
+              "Events"
+            ],
+            "properties": {
+              "Events": {
+                "maxItems": 50,
+                "minItems": 1,
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/eventBase"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "putMessageResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "SUCCESS"
+          },
+          "EnvelopeId": {
+            "type": "string",
+            "example": "9708e441-e20d-4189-9fc4-b7467cfa5a85"
+          }
+        }
+      },
+      "getMessagesResponse": {
+        "required": [
+          "messages"
+        ],
+        "type": "object",
+        "properties": {
+          "messages": {
+            "maxItems": 10,
+            "minItems": 0,
+            "type": "array",
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/envelopeOptions"
+                },
+                {
+                  "$ref": "#/components/schemas/envelopeMetadata"
+                },
+                {
+                  "required": [
+                    "Events"
+                  ],
+                  "properties": {
+                    "Events": {
+                      "maxItems": 50,
+                      "minItems": 1,
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/eventDetail"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "inline_response_200": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/getMessagesResponse"
+          }
+        ]
+      },
+      "inline_response_400": {
+        "required": [
+          "message"
+        ],
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "inline_response_401": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "inline_response_500": {
+        "required": [
+          "message"
+        ],
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "enum": [
+              "Unexpected Error."
+            ]
+          }
+        }
+      },
+      "Messages_body": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/putMessage"
+          }
+        ]
+      },
+      "traceRequest_Entities": {
+        "type": "object",
+        "properties": {
+          "EntityType": {
+            "type": "string",
+            "example": "person"
+          },
+          "EntityId": {
+            "type": "string",
+            "example": "169848"
+          }
+        }
+      },
+      "entityPipelineMetadata_LinkedEntityIds": {
+        "required": [
+          "AppClientId",
+          "EntityId"
+        ],
+        "type": "object",
+        "properties": {
+          "AppClientId": {
+            "type": "string",
+            "example": "855afa7c46n7ne635"
+          },
+          "EntityId": {
+            "type": "string",
+            "example": "89632"
+          }
+        }
+      }
+    },
+    "responses": {
+      "unexpectedError": {
+        "description": "Unexpected error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/inline_response_500"
+            }
+          }
+        }
+      },
+      "badRequest": {
+        "description": "Bad Request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/inline_response_400"
+            }
+          }
+        }
+      },
+      "unauthorized": {
+        "description": "Unauthorized",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/inline_response_401"
+            }
+          }
+        }
+      }
+    },
+    "parameters": {
+      "documentId": {
+        "name": "documentId",
+        "in": "path",
+        "description": "Document Identifier",
+        "required": true,
+        "style": "simple",
+        "explode": false,
+        "schema": {
+          "type": "string",
+          "example": "MJABgWTREweWYI0ObnsL***23IBVWBHAdgj53exd***269ad8409c1a46b6b30fc6dbb42c6100"
+        }
+      },
+      "receiptHandleHeader": {
+        "name": "ReceiptHandle",
+        "in": "header",
+        "description": "Receipt Handle of a Message",
+        "required": true,
+        "style": "simple",
+        "explode": false,
+        "schema": {
+          "type": "string",
+          "example": "AQEBSmNznZBtkFdjiT/SFfSljPcdYyhc3jLlLb/4YKLgI9DX3dOXSocD/NOoattbRRbgS6NQv3Wbem9Fm/47wrAI1LTqSOsz="
+        }
+      },
+      "envelopeIdHeader": {
+        "name": "EnvelopeId",
+        "in": "header",
+        "description": "ID of an Alliance Envelope",
+        "required": false,
+        "style": "simple",
+        "explode": false,
+        "schema": {
+          "type": "string",
+          "example": "e3de0faf-d4bc-4bb3-b2a7-f9853f500dec"
+        }
+      },
+      "maxMessagesHeader": {
+        "name": "MaxNumberOfMessages",
+        "in": "header",
+        "description": "Max Number of Messages to Attempt to Retrieve from the Queue",
+        "required": false,
+        "style": "simple",
+        "explode": false,
+        "schema": {
+          "type": "number",
+          "example": 5
+        }
+      }
+    },
+    "securitySchemes": {
+      "OAuthAuthorizer": {
+        "type": "http",
+        "description": "To obtain an authentication token, use basic authentication to send the clientID and clientSecret as the base64 encoded username and password to the appropriate endpoint. Make sure to include the `grant_type=client_credentials` parameter. Once you recieve the JWT token, copy and paste it into the value below\n\nIf you do not have a clientID or clientSecret, please contact Tyler Technologies.\n\nToken Issuer Endpoint: https://tyler-alliance-system-dev.auth.us-east-1.amazoncognito.com/oauth2/token\n\n```\n  ISSUER='https://tyler-alliance-system-dev.auth.us-east-1.amazoncognito.com/oauth2/token'\n  CLIENT_ID='Replace with your Client ID'\n  CLIENT_SECRET='Replace with your Client SECRET'\n  \n  \n  curl --location --request POST \"$ISSUER\" \\\n    --user \"$CLIENT_ID:$CLIENT_SECRET\" -basic \\\n    --header 'Content-Type: application/x-www-form-urlencoded' \\\n    --data-urlencode 'grant_type=client_credentials'\n```\n",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "x-amazon-apigateway-request-validators": {
+    "Validate body, query string parameters, and headers": {
+      "validateRequestBody": true,
+      "validateRequestParameters": true
+    }
+  }
+}
