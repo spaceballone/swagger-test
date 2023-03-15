@@ -106,7 +106,7 @@ A message starts with an `Envelope`. Details for each attribute of the `Envelope
 | TriggeredBy      | string       | Y        | The user triggering the event                                                                   |
 | ValidateEnvelope | boolean      | N        | Validate that the envelope is well formatted. Should be set to true unless instructed otherwise |
 
-### Events
+#### Events
 Envelopes may consist of one or more `events`. Details for each attribute of the `Event` are:
 
 | field            | allowed_type | required | description                                                         |
@@ -114,7 +114,7 @@ Envelopes may consist of one or more `events`. Details for each attribute of the
 | Entities          | array        | Y        | An array of events. For more details. [See next section](#entities) |
 | EventType         | string       | Y        | Always set to `di-aoic-new-record-event`                            |
 
-### Entities
+#### Entities
 Entities are the most important part of the message. This specifies the program, the record and the values associated with that record. 
 Details for each attribute are as follows
 
@@ -127,7 +127,7 @@ Details for each attribute are as follows
 | UpdateData     | boolean      | N        | Whether or not to update an existing message                                                                                     |
 | ValidateEntity | boolean      | N        | Validate that the entity and the data is well formatted. Should be set to true unless instructed otherwise                       |
 
-### Entity Data
+#### Entity Data
 Every entity data object must contain the elements, in the format required, listed in the [vendor folder](https://tylertech.sharepoint.com/sites/Client/DI/AOIC/Program%201%20%203%20Prepare%20Solution/Forms/AllItems.aspx?RootFolder=%2Fsites%2FClient%2FDI%2FAOIC%2FProgram%201%20%203%20Prepare%20Solution%2FVendor%20docs%2FData%20Elements%20%2D%20ALL&FolderCTID=0x012000E4E5E251D4298743B4D89B00DBBF4D85&View=%7B0F3FBEB1%2DB9A9%2D4E2E%2D957E%2D9E4144F8F6F9%7D)
 
 These should be passed as attributes in the object. For example
@@ -144,7 +144,7 @@ These should be passed as attributes in the object. For example
   }
 ```
 
-#### Notes on the entity data object
+##### Notes on the entity data object
 There are a couple of critical items to watch out for when building the entityData object:
 * **Data Elements** - Each entity **must** include the required elements listed in the [vendor folder](https://tylertech.sharepoint.com/sites/Client/DI/AOIC/Program%201%20%203%20Prepare%20Solution/Forms/AllItems.aspx?RootFolder=%2Fsites%2FClient%2FDI%2FAOIC%2FProgram%201%20%203%20Prepare%20Solution%2FVendor%20docs%2FData%20Elements%20%2D%20ALL&FolderCTID=0x012000E4E5E251D4298743B4D89B00DBBF4D85&View=%7B0F3FBEB1%2DB9A9%2D4E2E%2D957E%2D9E4144F8F6F9%7D), in the format specified. Failure to include these elements, or to format them in the right way could result in certification failure
 * **RowID** - Each object has a unique rowID. The RowID **must** follow a specific format: `4 digit year-County-Case Type-Vendor ID-Unique Number`. For example`2023-cook-criminalfelony-tyl-1234`
