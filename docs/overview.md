@@ -13,7 +13,7 @@ to the staging pipeline.
 Vendors will leverage their vendor specific authorization token
 and the Judicial Analytics Pipeline to upload and validate data. A
 connection will qualify for certification and verification if a
-`SUCCESS` response is received and there are no errors within the
+`SUCCESS` response is received for at least 10 records per program, and there are no errors within the
 Pipeline’s internal logs.
 
 Each Vendor should submit all available data elements and
@@ -113,8 +113,8 @@ Envelopes may consist of one or more `events`. Details for each attribute of the
 
 | field            | allowed_type | required | description                                                         |
 |------------------|--------------|----------|---------------------------------------------------------------------|
-| Entities           | array        | Y        | An array of events. For more details. [See next section](#entities) |
-| EventType         | string       | Y        | Always set to `di-aoic-new-record-event`                            |                           |
+| Entities          | array        | Y        | An array of events. For more details. [See next section](#entities) |
+| EventType         | string       | Y        | Always set to `di-aoic-new-record-event`                            |
 
 ### Entities
 Entities are the most important part of the message. This specifies the program, the record and the values associated with that record. 
