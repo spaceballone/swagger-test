@@ -190,7 +190,7 @@ In addition to the Data Verification Prerequisites, the following elements must 
 *Critical for certification. May not be required for production
 data submissions
 
-**this element is the rowID. See this section for the row ID format
+**this element is the rowID. [See this section](![logo](https://www.tylertech.com/Portals/0/Logo-NavBar.jpg?ver=Js0wL8bzpXBsBHn_bv-Kjg%3d%3d) for the row ID format
 
 Example
 ```json
