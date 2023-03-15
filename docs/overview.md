@@ -46,18 +46,15 @@ Data Requirements
 ## Step 1: Get an Authorization (Bearer) Token
 The Certification Instance of the Pipeline is access-controlled
 such that each vendor has its own credential pair. A credential
-pair consists of a Client ID and Client Secret. Vendors should
-have received a Client ID and Client Secret via a secure email.
+pair consists of a `Client ID` and `Client Secret`. Vendors should
+have received a `Client ID` and `Client Secret` via a secure email.
 
 Vendors will use this pair to get a bearer token that will allow
 them to interact with the Judicial Analytics Pipeline.
-
+```
 Note: this command will provide a bearer token that is valid for
 60 minutes.
-
-Sample cURL and PowerShell commands can be found here to
-demonstrate minimal examples for each data element set. 
-
+```
 #### Example curl command 
 
 ```
