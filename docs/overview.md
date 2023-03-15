@@ -189,7 +189,7 @@ Upon successful validation Tyler will submit the vendor’s certification with t
 The following section provides a series of data element examples for each program
 
 ### Pretrial Program Pipeline Critical Elements
-`In addition to the Data Verification Prerequisites, `the following elements must be included in every PSC record:
+In addition to the Data Verification Prerequisites, the following elements must be included in every PSC record:
 
 * county
 * instanceid
@@ -302,7 +302,7 @@ error message for data validation?
    have Error Details, which indicate the type of error
    encountered. Once fixed, please try to upload again. If you
    have issues resolving your issue, please reach out directly
-   to the Tyler team at data-certification@tylertech.com.
+   to the Tyler team at [data-certification@tylertech.com](mailto:data-certification@tylertech.com).
    After you correct an error and re-submit, you may receive
    another error message calling out another error in the
    submission. Repeat the retry process until all errors are
@@ -363,3 +363,9 @@ resolve your question as quickly and efficiently as possible:
   * Describe your question or issue 
   * Share relevant context about the issue, including links,
   screenshots and specific steps taken
+
+## Todos on this page
+[ ] Update the JSON objects in the examples section
+[ ] Finalize the row id
+[ ] Put it on dev.socrata.com (?)
+[ ] Finalize the county stuff
