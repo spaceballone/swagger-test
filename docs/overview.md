@@ -103,7 +103,7 @@ A message starts with an `Envelope`. Details for each attribute of the `Envelope
 
 | field            | allowed_type | required | description                                                                                     |
 |------------------|--------------|----------|-------------------------------------------------------------------------------------------------|
-| Events           | array        | Y        | An array of events. For more details. See next section                                          |
+| Events           | array        | Y        | An array of events. For more details. [See next section](#events)                               |
 | PartnerID        | string       | Y        | Your partner ID                                                                                 |
 | ResolveMappings  | boolean      | N        |                                                                                                 |
 | TriggeredBy      | string       | Y        | The user triggering the event                                                                   |
@@ -112,10 +112,10 @@ A message starts with an `Envelope`. Details for each attribute of the `Envelope
 ### Events
 Envelopes may consist of one or more `events`. Details for each attribute of the `Event` are:
 
-| field            | allowed_type | required | description                                                                                     |
-|------------------|--------------|----------|-------------------------------------------------------------------------------------------------|
-| Entities           | array        | Y        | An array of events. For more details. See next section                                        |
-| EventType         | string       | Y        | Always set to `di-aoic-new-record-event`                                                      |                           |
+| field            | allowed_type | required | description                                                         |
+|------------------|--------------|----------|---------------------------------------------------------------------|
+| Entities           | array        | Y        | An array of events. For more details. [See next section](#entities) |
+| EventType         | string       | Y        | Always set to `di-aoic-new-record-event`                            |                           |
 
 ### Entities
 Entities are the most important part of the message. This specifies the program, the record and the values associated with that record. 
@@ -124,14 +124,14 @@ Details for each attribute are as follows
 | field          | allowed_type | required | description                                                                                                                      |
 |----------------|--------------|----------|----------------------------------------------------------------------------------------------------------------------------------|
 | EntityID       | string       | Y        | Always set to `AOIC`                                                                                                             |
-| EntityType     | string       | Y        | Maps to the specific program and data in the format `di-[Program Name]-[Dataset Name]`. See [below for more examples](#Examples) |
+| EntityType     | string       | Y        | Maps to the specific program and data in the format `di-[Program Name]-[Dataset Name]`. See [below for more examples](#examples) |
 | EntityData     | object       | Y        | The record associated with this entity                                                                                           |
 | LinkEntity     | boolean      | N        | Links this entity to another. Can be ignored                                                                                     |
 | UpdateData     | boolean      | N        | Whether or not to update an existing message                                                                                     |
 | ValidateEntity | boolean      | N        | Validate that the entity and the data is well formatted. Should be set to true unless instructed otherwise                       |
 
 ### Entity Data
-Every entity data object must contain the set of required elements listed in the [vendor folder](https://tylertech.sharepoint.com/sites/Client/DI/AOIC/Program%201%20%203%20Prepare%20Solution/Forms/AllItems.aspx?RootFolder=%2Fsites%2FClient%2FDI%2FAOIC%2FProgram%201%20%203%20Prepare%20Solution%2FVendor%20docs%2FData%20Elements%20%2D%20ALL&FolderCTID=0x012000E4E5E251D4298743B4D89B00DBBF4D85&View=%7B0F3FBEB1%2DB9A9%2D4E2E%2D957E%2D9E4144F8F6F9%7D), in the format specified
+Every entity data object must contain the elements, in the format required, listed in the [vendor folder](https://tylertech.sharepoint.com/sites/Client/DI/AOIC/Program%201%20%203%20Prepare%20Solution/Forms/AllItems.aspx?RootFolder=%2Fsites%2FClient%2FDI%2FAOIC%2FProgram%201%20%203%20Prepare%20Solution%2FVendor%20docs%2FData%20Elements%20%2D%20ALL&FolderCTID=0x012000E4E5E251D4298743B4D89B00DBBF4D85&View=%7B0F3FBEB1%2DB9A9%2D4E2E%2D957E%2D9E4144F8F6F9%7D)
 
 These should be passed as attributes in the object. For example
 ```json
