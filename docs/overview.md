@@ -39,7 +39,7 @@ program (Probation, Pretrial, PSC, and Courts)
 * Submission of the Court Mapping Tool to AOIC *(Courts
 Program only)
 
-### Data Verification Requirements
+#### Data Verification Requirements
 
 * Pipeline critical elements (for specific formatting validation)
   * Defined in detail in the Pipeline Critical Elements section
@@ -190,7 +190,7 @@ In addition to the Data Verification Prerequisites, the following elements must 
 *Critical for certification. May not be required for production
 data submissions
 
-**this element is the rowID. [See this section](![logo](https://www.tylertech.com/Portals/0/Logo-NavBar.jpg?ver=Js0wL8bzpXBsBHn_bv-Kjg%3d%3d) for the row ID format
+**this element is the rowID. [See this section](https://spaceballone.github.io/swagger-test/docs/overview#rowid) for the row ID format
 
 Example
 ```json

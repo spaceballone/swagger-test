@@ -1,5 +1,5 @@
 ---
-title: Sample data
+title: Sample events
 ---
 ```
 {
