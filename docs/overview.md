@@ -1,11 +1,10 @@
 ---
 title: Overview
+noindex: true
 ---
-![logo](https://www.tylertech.com/Portals/0/Logo-NavBar.jpg?ver=Js0wL8bzpXBsBHn_bv-Kjg%3d%3d)
 
-# Tyler Data Pipeline Certification 
-## Objective
 
+# ![logo](https://www.tylertech.com/Portals/0/Logo-NavBar.jpg?ver=Js0wL8bzpXBsBHn_bv-Kjg%3d%3d) Tyler Data Pipeline Certification 
 These instructions and resources are intended to walk through
 the technical process of certifying data in the Tyler Judicial
 Analytics Pipeline. This is a prerequisite to be granted access
@@ -14,7 +13,7 @@ to the staging pipeline.
 Vendors will leverage their vendor specific authorization token
 and the Judicial Analytics Pipeline to upload and validate data. A
 connection will qualify for certification and verification if: a
-SUCCESS response is received and there are no errors within the
+`SUCCESS` response is received and there are no errors within the
 Pipeline’s internal logs.
 
 Each Vendor should submit all available data elements and
