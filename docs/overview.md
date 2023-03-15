@@ -2,8 +2,6 @@
 title: Overview
 noindex: true
 ---
-
-
 # ![logo](https://www.tylertech.com/Portals/0/Logo-NavBar.jpg?ver=Js0wL8bzpXBsBHn_bv-Kjg%3d%3d) Tyler Data Pipeline Certification 
 These instructions and resources are intended to walk through
 the technical process of certifying data in the Tyler Judicial
@@ -28,7 +26,7 @@ county.**
 Elements Mapping Tool must be returned to AOIC before
 certification can begin.**
 
-# Prerequisites
+## Prerequisites
 
 The following are required to begin the Certification
 Process:
@@ -43,7 +41,7 @@ Data Requirements
 
 * Access to data for each of the critical and optional elements listed in the [vendor folder](https://tylertech.sharepoint.com/sites/Client/DI/AOIC/Program%201%20%203%20Prepare%20Solution/Forms/AllItems.aspx?RootFolder=%2Fsites%2FClient%2FDI%2FAOIC%2FProgram%201%20%203%20Prepare%20Solution%2FVendor%20docs%2FData%20Elements%20%2D%20ALL&FolderCTID=0x012000E4E5E251D4298743B4D89B00DBBF4D85&View=%7B0F3FBEB1%2DB9A9%2D4E2E%2D957E%2D9E4144F8F6F9%7D)
 
-# Step 1: Get an Authorization (Bearer) Token
+## Step 1: Get an Authorization (Bearer) Token
 The Certification Instance of the Pipeline is access-controlled
 such that each vendor has its own credential pair. A credential
 pair consists of a `Client ID` and `Client Secret`. Vendors should
@@ -61,8 +59,8 @@ curl https://tyler-alliance-system-dev.auth.us-east-1.amazoncognito.com/oauth2/t
 ```
 Please refer to the [API documentation](http://aoic-api.s3-website-us-west-2.amazonaws.com/) for more information.
 
-# Step 2: Submit Messages to the Pipeline API
-## Build the message
+## Step 2: Submit Messages to the Pipeline API
+### Build the message
 Every message consists of a series of entities, as well as metadata to help route the message appropriately
 
 An example message might look like
@@ -153,14 +151,14 @@ There are a couple of critical items to watch out for when building the entityDa
 
 
 
-## Send the message
+### Send the message
 Using the Bearer Token received from the Step 1, and the message prepared in the previous section, send an API
 call to **PUT** the Message built in the previous section. 
 
 Sample cURL and PowerShell commands can be found [here](https://tylertech.sharepoint.com/sites/Client/DI/AOIC/Program%201%20%203%20Prepare%20Solution/Forms/AllItems.aspx?csf=1&web=1&e=XIcIAS&cid=a0eb1b19%2D1106%2D4d00%2D8323%2D8d93d5213bbc&RootFolder=%2Fsites%2FClient%2FDI%2FAOIC%2FProgram%201%20%203%20Prepare%20Solution%2FVendor%20docs%2FCertification%20directions%2Fcertification%5Fexample%5Fcommands&FolderCTID=0x012000E4E5E251D4298743B4D89B00DBBF4D85) to
 demonstrate minimal examples for each data element set.
 
-## Validate the response
+### Validate the response
 A successful response will look like:
 ```json
 {
@@ -174,7 +172,7 @@ additional record(s).
 **Make sure to screenshot and copy the SUCCESS response
 with the envelopeID, this is needed for Step 3**
 
-# Step 3: Complete Certification
+## Step 3: Complete Certification
 Vendors must email their SUCCESS response and EnvelopeID. **Note: Separate emails must be sent for each county program area**
 * Send to: [data-certification@tylertech.com](mailto:data-certification@tylertech.com)
 * Subject: Certification SUCCESS - [Program Area - County]
@@ -184,10 +182,10 @@ Tyler will confirm receipt of the email within 1 business day
 Upon successful validation Tyler will submit the vendor’s certification with the State and notify the vendor that certification has been completed
 
 
-# Examples
+## Examples
 The following section provides a series of data element examples for each program
 
-## Pretrial Program Pipeline Critical Elements
+### Pretrial Program Pipeline Critical Elements
 In addition to the Data Verification Prerequisites, the following elements must be included in every PSC record:
 
 * county
@@ -222,7 +220,7 @@ In addition to the Data Verification Prerequisites, the following elements must 
 
 
 
-## Probation Program Pipeline Critical Elements
+### Probation Program Pipeline Critical Elements
 In addition to the Data Verification Prerequisites, the
 following elements must be included in every Probation
 record:
@@ -249,7 +247,7 @@ record:
 
 [2] RowID. [See this section](https://spaceballone.github.io/swagger-test/docs/overview#rowid) for the row ID format
 
-## Problem Solving Courts Program Pipeline Critical Elements
+### Problem Solving Courts Program Pipeline Critical Elements
 In addition to the Data Verification Prerequisites, the
 following elements must be included in every PSC record:
 * county
@@ -289,7 +287,7 @@ following elements must be included in every Courts record:
 ##### Notes
 [1] Must be present for certification
 
-# FAQ 
+## FAQ 
 1. Where can I find more information about the API?
    2. Please refer to the [API documentation](http://aoic-api.s3-website-us-west-2.amazonaws.com/) for more information.
 2. What happens if I get a SUCCESS response but receive an
@@ -333,7 +331,7 @@ each Program?
    element reporting program’s PowerShell or cURL (Mac)
    PUT call.
 
-# Need Help?
+## Need Help?
 
 Our team is here to help! We are offering various options to
 support you throughout this process:
@@ -363,8 +361,11 @@ resolve your question as quickly and efficiently as possible:
   * Share relevant context about the issue, including links,
   screenshots and specific steps taken
 
-# Todos on this page
+## Todos on this page
 [ ] Update the JSON objects in the examples section
+
 [ ] Finalize the row id
+
 [ ] Put it on dev.socrata.com (?)
+
 [ ] Finalize the county stuff
