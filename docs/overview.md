@@ -20,7 +20,7 @@ Each Vendor should submit all available data elements and
 specifically include all pipeline critical elements noted in the
 Pipeline Critical Elements section below. The submission is
 considered acceptable if no validation errors are triggered and
-the required data elements contain a value suitable for its
+the required data elements contai*n* a value suitable for its
 respective datatype. **Certification will occur by program per
 county.**
 
@@ -80,7 +80,7 @@ An example message might look like
               "localid": 9152,
               "instanceid": "5008",
               "offenderid": "4354",
-              "dateofbirth": "1900/11/12",
+              "dateofbirth": "11/12/1982",
               "sexperceived": "Male",
               "pretrialbackgroundid": "2023-cook-asdf-tyl-9152",
               "county": "cook"
@@ -139,7 +139,7 @@ These should be passed as attributes in the object. For example
      "localid": 9152,
      "instanceid": "5008",
      "offenderid": "4354",
-     "dateofbirth": "1900/11/12",
+     "dateofbirth": "11/12/1982",
      "sexperceived": "Male",
      "pretrialbackgroundid": "2023-cook-asdf-tyl-9152",
      "county": "cook"
@@ -207,7 +207,7 @@ In addition to the Data Verification Prerequisites, the following elements must 
      "localid": 9152,
      "instanceid": "5008",
      "offenderid": "4354",
-     "dateofbirth": "1900/11/12",
+     "dateofbirth": "11/12/1982",
      "sexperceived": "Male",
      "pretrialbackgroundid": "2023-cook-asdf-tyl-9152",
      "county": "cook"
