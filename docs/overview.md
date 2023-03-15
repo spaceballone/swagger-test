@@ -12,7 +12,7 @@ to the staging pipeline.
 
 Vendors will leverage their vendor specific authorization token
 and the Judicial Analytics Pipeline to upload and validate data. A
-connection will qualify for certification and verification if: a
+connection will qualify for certification and verification if a
 `SUCCESS` response is received and there are no errors within the
 Pipeline’s internal logs.
 
@@ -153,13 +153,14 @@ Both RowID and entity type follow specific formats
 ```
 di-[Program Name]-[Dataset Name]
 ```
-Examples:
-```
-Courts program and the Party Hearing dataset: di-aoic-courts-party-hearing  
-Pretrial program and the Individual Background dataset: di-aoic-pretrial-individual-background 
-Probation program and the Intake dataset: di-aoic-probation-intake 
-PSC program and the PSC Status dataset: di-aoic-problem-solving-courts-psc-status 
-```
+##### Examples
+
+| Entity-type | Description |
+| ------------|-------------|
+| di-aoic-courts-party-hearing          | Courts program and the Party Hearing dataset         |
+| di-aoic-pretrial-individual-background          | Pretrial program and the Individual Background dataset         |
+| di-aoic-probation-intake          | Probation program and the Intake dataset         |
+| di-aoic-problem-solving-courts-psc-status          | PSC program and the PSC Status dataset         |
 
 #### RowID
 The row ID is produced by the CMS system and matches the following pattern: 
