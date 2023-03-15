@@ -1,3 +1,6 @@
+---
+title: Sample data
+---
 ```
 {
     "TriggeredBy": "postman",
