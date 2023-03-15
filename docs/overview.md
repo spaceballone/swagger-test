@@ -1,6 +1,8 @@
 ---
 title: Overview
 ---
+![logo](https://www.tylertech.com/Portals/0/Logo-NavBar.jpg?ver=Js0wL8bzpXBsBHn_bv-Kjg%3d%3d)
+
 # Tyler Data Pipeline Certification 
 ## Objective
 
