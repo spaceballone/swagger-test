@@ -52,8 +52,7 @@ have received a `Client ID` and `Client Secret` via a secure email.
 Vendors will use this pair to get a bearer token that will allow
 them to interact with the Judicial Analytics Pipeline.
 ```
-Note: this command will provide a bearer token that is valid for
-60 minutes.
+Note: this command will provide a bearer token that is valid for 60 minutes.
 ```
 #### Example curl command 
 
