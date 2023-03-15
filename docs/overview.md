@@ -39,14 +39,9 @@ program (Probation, Pretrial, PSC, and Courts)
 * Submission of the Court Mapping Tool to AOIC *(Courts
 Program only)
 
-#### Data Verification Requirements
+Data Requirements
 
-* Pipeline critical elements (for specific formatting validation)
-  * Defined in detail in the Pipeline Critical Elements section
-  below. 
-* ALL elements that are available in your vendor system 
-
-All data elements are housed in the [vendor folder](https://tylertech.sharepoint.com/sites/Client/DI/AOIC/Program%201%20%203%20Prepare%20Solution/Forms/AllItems.aspx?RootFolder=%2Fsites%2FClient%2FDI%2FAOIC%2FProgram%201%20%203%20Prepare%20Solution%2FVendor%20docs%2FData%20Elements%20%2D%20ALL&FolderCTID=0x012000E4E5E251D4298743B4D89B00DBBF4D85&View=%7B0F3FBEB1%2DB9A9%2D4E2E%2D957E%2D9E4144F8F6F9%7D)
+* Access to data for each of the critical and optional elements listed in the [vendor folder](https://tylertech.sharepoint.com/sites/Client/DI/AOIC/Program%201%20%203%20Prepare%20Solution/Forms/AllItems.aspx?RootFolder=%2Fsites%2FClient%2FDI%2FAOIC%2FProgram%201%20%203%20Prepare%20Solution%2FVendor%20docs%2FData%20Elements%20%2D%20ALL&FolderCTID=0x012000E4E5E251D4298743B4D89B00DBBF4D85&View=%7B0F3FBEB1%2DB9A9%2D4E2E%2D957E%2D9E4144F8F6F9%7D)
 
 ## Step 1: Get an Authorization (Bearer) Token
 The Certification Instance of the Pipeline is access-controlled
@@ -71,55 +66,103 @@ curl https://tyler-alliance-system-dev.auth.us-east-1.amazoncognito.com/oauth2/t
 Please refer to the [API documentation](http://aoic-api.s3-website-us-west-2.amazonaws.com/) for more information.
 
 ## Step 2: Submit Messages to the Pipeline API
-Using the Bearer Token received from the Step 1, prepare an API
-call to **PUT** a Message. A Message is simply a Record of Data.
-This record of data should include all the data elements that are
-available and specifically include the critical pipeline fields listed
-below in the Pipeline Critical Elements section.
+### Build the message
+Every message consists of a series of entities, as well as metadata to help route the message appropriately
 
-Sample cURL and PowerShell commands can be found here to
+An example message might look like
+```json
+{
+  "Events": [
+    {
+      "Entities": [
+        {
+          "EntityId": "AOIC",
+          "EntityType": "di-aoic-problem-solving-courts-individual-background",
+          "LinkEntity": true,
+          "EntityData": {
+              "name": "Dale Bell",
+              "localid": 9152,
+              "instanceid": "5008",
+              "offenderid": "4354",
+              "dateofbirth": "1900/11/12",
+              "sexperceived": "Male",
+              "pretrialbackgroundid": "2023-cook-asdf-tyl-9152",
+              "county": "cook"
+           },
+          "UpdateData": true,
+          "ValidateEntity": true
+        }
+      ],
+      "EventType": "di-aoic-new-record-event"
+    }
+  ],
+  "PartnerId": "1000",
+  "ResolveMappings": true,
+  "TriggeredBy": "jane.doe@example.com",
+  "ValidateEnvelope": true
+}
+```
+Details for each attribute are as follows
+
+| field            | allowed_type | required | description                                                                                     |
+|------------------|--------------|----------|-------------------------------------------------------------------------------------------------|
+| Events           | array        | Y        | An array of events. For more details. See next section                                          |
+| PartnerID        | string       | Y        | Your partner ID                                                                                 |
+| ResolveMappings  | boolean      | N        |                                                                                                 |
+| TriggeredBy      | string       | Y        | The user triggering the event                                                                   |
+| ValidateEnvelope | boolean      | N        | Validate that the envelope is well formatted. Should be set to true unless instructed otherwise |
+
+### Events
+Events contain entities. The EventType should always be set to `di-aoic-new-record-event`
+
+### Entities
+Entities are the most important part of the message. This specifies the program, the record and the values associated with that record. 
+Details for each attribute are as follows
+
+| field          | allowed_type | required | description                                                                                                       |
+|----------------|--------------|----------|-------------------------------------------------------------------------------------------------------------------|
+| EntityID       | string       | Y        | Always set to `AOIC`                                                                                                |
+| EntityType     | string       | Y        | Maps to the specific program and data in the format `di-[Program Name]-[Dataset Name]`. See below for more examples |
+| EntityData     | object       | Y        | The record associated with this entity                                                                            |
+| LinkEntity     | boolean      | N        | Links this entity to another. Can be ignored                                                                      |
+| UpdateData     | boolean      | N        | Whether or not to update an existing message                                                                      |
+| ValidateEntity | boolean      | N        | Validate that the entity and the data is well formatted. Should be set to true unless instructed otherwise        |
+
+### Entity Data
+Every entity data object contains a set of required elements listed in the [vendor folder](https://tylertech.sharepoint.com/sites/Client/DI/AOIC/Program%201%20%203%20Prepare%20Solution/Forms/AllItems.aspx?RootFolder=%2Fsites%2FClient%2FDI%2FAOIC%2FProgram%201%20%203%20Prepare%20Solution%2FVendor%20docs%2FData%20Elements%20%2D%20ALL&FolderCTID=0x012000E4E5E251D4298743B4D89B00DBBF4D85&View=%7B0F3FBEB1%2DB9A9%2D4E2E%2D957E%2D9E4144F8F6F9%7D), in the format specified
+
+These should be passed as key values in the object. For example
+```json
+"entityData": {
+     "name": "Dale Bell",
+     "localid": 9152,
+     "instanceid": "5008",
+     "offenderid": "4354",
+     "dateofbirth": "1900/11/12",
+     "sexperceived": "Male",
+     "pretrialbackgroundid": "2023-cook-asdf-tyl-9152",
+     "county": "cook"
+  }
+```
+
+#### Notes on the entity data object
+There are a couple of critical items to watch out for when building the entityData object:
+* Each entity **must** include the required elements listed in the [vendor folder](https://tylertech.sharepoint.com/sites/Client/DI/AOIC/Program%201%20%203%20Prepare%20Solution/Forms/AllItems.aspx?RootFolder=%2Fsites%2FClient%2FDI%2FAOIC%2FProgram%201%20%203%20Prepare%20Solution%2FVendor%20docs%2FData%20Elements%20%2D%20ALL&FolderCTID=0x012000E4E5E251D4298743B4D89B00DBBF4D85&View=%7B0F3FBEB1%2DB9A9%2D4E2E%2D957E%2D9E4144F8F6F9%7D), in the format specified 
+* This record of data should also include all the data elements that are
+available in your system
+* The RowID for each program must follow a specific format: `4 digit year-County-Case Type-Vendor ID-Unique Number`
+  * Example: `2023-cook-criminalfelony-tyl-1234`
+
+Failure to include these elements, or to format them in the right way could result in certification failure
+
+### Send the message
+Using the Bearer Token received from the Step 1, and the message prepared in the previous section, send an API
+call to **PUT** the Message built in the previous section. 
+
+Sample cURL and PowerShell commands can be found [here](https://tylertech.sharepoint.com/sites/Client/DI/AOIC/Program%201%20%203%20Prepare%20Solution/Forms/AllItems.aspx?csf=1&web=1&e=XIcIAS&cid=a0eb1b19%2D1106%2D4d00%2D8323%2D8d93d5213bbc&RootFolder=%2Fsites%2FClient%2FDI%2FAOIC%2FProgram%201%20%203%20Prepare%20Solution%2FVendor%20docs%2FCertification%20directions%2Fcertification%5Fexample%5Fcommands&FolderCTID=0x012000E4E5E251D4298743B4D89B00DBBF4D85) to
 demonstrate minimal examples for each data element set.
 
-#### Example PowerShell command 
-```powershell
-$headers = New-Object
-"System.Collections.Generic.Dictionary[[String],[String]]"
-$headers.Add("Content-Type", "application/json")
-$headers.Add("Authorization", "Bearer YOUR_TOKEN_HERE")
-
-$body = "{
-    `"Events`": [      {
-        `"EventType`": `"di-aoic-new-record-event`",
-        `"Entities`": [
-            {
-                `"EntityType`": di-aoic-problem-solving-courts-
-individual-background,
-                `"EntityId`": `"AOIC`",
-                `"LinkEntity`": true,
-                `"EntityData`": {
-                                    `"county`": `"cook`",
-                                    `"offenderid`": `"9816`",
-                                    `"dateofbirth`": `"10/20/1989`",
-                                    `"pscbackgroundid`": `"4238`",
-                                    `"instanceid`": `"7865`",
-                                    `"name`": `"Heather Graham`",
-                                    `"sexperceived`": `"Female`",
-                                    `"localid`": 8147,
-                        }
-                }
-            ]
-        }
-    ]
-}"
-
-response = Invoke-RestMethod 'https://api.dev.tyleralliance.com/
-exchange/Messages' -Method 'PUT' -Headers $headers -Body
-$body
-
-$response | ConvertTo-Json
-```
-Please refer to the [API documentation](http://aoic-api.s3-website-us-west-2.amazonaws.com/) for more information.
-
+### Validate the response
 A successful response will look like:
 ```json
 {
@@ -127,7 +170,7 @@ A successful response will look like:
   "EnvelopeId": "UNIQUE-ENVELOPE-ID"
 }
 ```
-Repeat Step 2, utilizing the same 60-min token, to submit
+If you receive a successful response, repeat Step 2, utilizing the same 60-min token, to submit
 additional record(s).
 
 **Make sure to screenshot and copy the SUCCESS response
@@ -143,72 +186,116 @@ Tyler will confirm receipt of the email within 1 business day
 Upon successful validation:
 * Tyler will submit the vendor’s certification with the State and notify the vendor that certification has been completed
 
-## Data Elements
-Every entity must include each of the required elements listed in the [vendor folder](https://tylertech.sharepoint.com/sites/Client/DI/AOIC/Program%201%20%203%20Prepare%20Solution/Forms/AllItems.aspx?RootFolder=%2Fsites%2FClient%2FDI%2FAOIC%2FProgram%201%20%203%20Prepare%20Solution%2FVendor%20docs%2FData%20Elements%20%2D%20ALL&FolderCTID=0x012000E4E5E251D4298743B4D89B00DBBF4D85&View=%7B0F3FBEB1%2DB9A9%2D4E2E%2D957E%2D9E4144F8F6F9%7D) 
 
-### Formatting data elements
-Both RowID and entity type follow specific formats
-
-#### EntityType 
-```
-di-[Program Name]-[Dataset Name]
-```
-##### Examples
-
-| Entity-type | Description |
-| ------------|-------------|
-| di-aoic-courts-party-hearing          | Courts program and the Party Hearing dataset         |
-| di-aoic-pretrial-individual-background          | Pretrial program and the Individual Background dataset         |
-| di-aoic-probation-intake          | Probation program and the Intake dataset         |
-| di-aoic-problem-solving-courts-psc-status          | PSC program and the PSC Status dataset         |
-
-#### RowID
-The row ID is produced by the CMS system and matches the following pattern: 
-
-County, case type and vendor ID should be lowercase with no white space.
-```
-4 digit year-County-Case Type-Vendor ID-Unique Number
-```
-
-Example:
-```
-2023-cook-criminalfelony-tyl-1234
-```
-
+## Examples
+The following section provides a series of examples for each program
 
 ### Pretrial Program Pipeline Critical Elements
-In addition to the Data Verification Prerequisites, the following elements must be included in every PSC record:
+`In addition to the Data Verification Prerequisites, `the following elements must be included in every PSC record:
 
 * county
 * instanceid
 * offenderid
 * name
 * localid
-* dateofbirth*
-* sexperceived*
-* pretrialbackground**
+* dateofbirth [1]
+* sexperceived [1]
+* pretrialbackground [2]
 
-*Critical for certification. May not be required for production
-data submissions
-
-**this element is the rowID. [See this section](https://spaceballone.github.io/swagger-test/docs/overview#rowid) for the row ID format
-
-Example
+##### Example
 ```json
-"Entities": [{
-    "name": "Dale Bell",
-    "localid":  9152,
-    "instanceid": "5008",
-    "offenderid": "4354",
-    "dateofbirth": "1900/11/12",
-    "sexperceived": "Male",                    
-    "pretrialbackgroundid": "2023-cook-asdf-tyl-9152",
-    "county": "cook",
+"Entities": [
+  "entityData": {
+     "name": "Dale Bell",
+     "localid": 9152,
+     "instanceid": "5008",
+     "offenderid": "4354",
+     "dateofbirth": "1900/11/12",
+     "sexperceived": "Male",
+     "pretrialbackgroundid": "2023-cook-asdf-tyl-9152",
+     "county": "cook"
+  }
 }]
 ```
 
+##### Notes
+[1] Must be present for certification
+
+[2] RowID. [See this section](https://spaceballone.github.io/swagger-test/docs/overview#rowid) for the row ID format
+
+
+
+### Probation Program Pipeline Critical Elements
+In addition to the Data Verification Prerequisites, the
+following elements must be included in every Probation
+record:
+
+* county
+* instanceid
+* offenderid
+* name
+* localid
+* dateofbirth [1]
+* sexperceived [1]
+* probationbackgroundid [2]
+
+##### Example
+```json
+"Entities": [
+  "entityData": {
+     tbd
+  }
+}]
+```
+##### Notes
+[1] Must be present for certification
+
+[2] RowID. [See this section](https://spaceballone.github.io/swagger-test/docs/overview#rowid) for the row ID format
+
+### Problem Solving Courts Program Pipeline Critical Elements
+In addition to the Data Verification Prerequisites, the
+following elements must be included in every PSC record:
+* county
+* instanceid
+* offenderid
+* name
+* localid
+* dateofbirth [1]
+* sexperceived [1]
+* pscbackgroundid [2]
+##### Example
+```json
+"Entities": [
+  "entityData": {
+     tbd
+  }
+```
+##### Notes
+[1] Must be present for certification
+
+[2] RowID. [See this section](https://spaceballone.github.io/swagger-test/docs/overview#rowid) for the row ID format
+
+
+### Courts Program Pipeline Critical Elements
+In addition to the Data Verification Prerequisites, the
+following elements must be included in every Courts record:
+* county
+* statusdate
+* casestatusrowid [1]
+##### Example
+```json
+"Entities": [
+  "entityData": {
+     tbd
+  }
+```
+##### Notes
+[1] Must be present for certification
+
 ## FAQ 
-1. What happens if I get a SUCCESS response but receive an
+1. Where can I find more information about the API?
+   2. Please refer to the [API documentation](http://aoic-api.s3-website-us-west-2.amazonaws.com/) for more information.
+2. What happens if I get a SUCCESS response but receive an
 error message for data validation?
    * If there is an error in your submission, you’ll receive an
    email from AWS Notifications within a few minutes of your
