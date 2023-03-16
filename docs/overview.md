@@ -61,7 +61,7 @@ Please refer to the [API documentation](http://aoic-api.s3-website-us-west-2.ama
 
 ## Step 2: Submit Messages to the Pipeline API
 ### Build the message
-Every message consists of a series of entities, as well as metadata to help route the message appropriately
+Every message consists of an `envelope`. The `envelope` contains a series of `events`, as well as metadata to help route the message appropriately
 
 An example message might look like
 ```json
@@ -96,7 +96,7 @@ An example message might look like
   "ValidateEnvelope": true
 }
 ```
-A message starts with an `Envelope`. Details for each attribute of the `Envelope` are:
+Details for each attribute of the `Envelope` are:
 
 | field            | allowed_type | required | description                                                                                     |
 |------------------|--------------|----------|-------------------------------------------------------------------------------------------------|
@@ -366,6 +366,9 @@ resolve your question as quickly and efficiently as possible:
 
 [ ] Finalize the row id
 
+[ ] Look at the row id from a security model perspective. Can I as a vendor accidentially (or purposefully manipulate someone elses data?)? I think that the answer right now is "Yes!"
+
 [ ] Put it on dev.socrata.com (?)
 
 [ ] Finalize the county stuff
+
