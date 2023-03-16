@@ -194,18 +194,25 @@ In addition to the Data Verification Prerequisites, the following elements must 
 
 ##### Example
 ```json
-"Entities": [
-  "entityData": {
-     "name": "Dale Bell",
-     "localid": 9152,
-     "instanceid": "5008",
-     "offenderid": "4354",
-     "dateofbirth": "11/12/1982",
-     "sexperceived": "Male",
-     "pretrialbackgroundid": "2023-cook-asdf-tyl-9152",
-     "county": "cook"
-  }
-}]
+{
+    "Entities": [
+        {
+            "EntityType": "di-aoic-pretrial-violations",
+            "EntityId": "violations_record",
+            "LinkEntity": true,
+            "EntityData": {
+                "name": "Dale Bell",
+                "localid": 9152,
+                "instanceid": "5008",
+                "offenderid": "4354",
+                "dateofbirth": "11/12/1982",
+                "sexperceived": "Male",
+                "pretrialbackgroundid": "2023-cook-ordinanceviolation-vendorname-9152",
+                "county": "cook"
+            }
+        }
+    ]
+}
 ```
 
 ##### Notes
@@ -231,11 +238,25 @@ record:
 
 ##### Example
 ```json
-"Entities": [
-  "entityData": {
-     tbd
-  }
-}]
+{
+    "Entities": [
+        {
+            "EntityType": "di-aoic-probation-individual-background",
+            "EntityId": "individual_background_record",
+            "LinkEntity": true,
+            "EntityData": {
+                "name": "John Smith",
+                "localid": 6726,
+                "instanceid": "3005",
+                "offenderid": "4535",
+                "dateofbirth": "03/14/1959",
+                "sexperceived": "Male",
+                "probationbackgroundid": "2019-kankakee-civillaw-vendorname-8701",
+                "county": "kankakee"
+            }
+        }
+    ]
+}
 ```
 ##### Notes
 [1] Must be present for certification
@@ -255,10 +276,25 @@ following elements must be included in every PSC record:
 * pscbackgroundid [2]
 ##### Example
 ```json
-"Entities": [
-  "entityData": {
-     tbd
-  }
+{
+    "Entities": [
+        {
+            "EntityType": "di-aoic-problem-solving-courts-screening",
+            "EntityId": "screening_record",
+            "LinkEntity": true,
+            "EntityData": {
+                "name": "Jane Doe",
+                "localid": 2667,
+                "instanceid": "3423",
+                "offenderid": "4575",
+                "dateofbirth": "12/21/1991",
+                "sexperceived": "Female",
+                "pscbackgroundid": "2017-sangamon-conservationviolation-vendorname-2468",
+                "county": "sangamon"
+            }
+        }
+    ]
+}
 ```
 ##### Notes
 [1] Must be present for certification
@@ -274,10 +310,20 @@ following elements must be included in every Courts record:
 * casestatusrowid [1]
 ##### Example
 ```json
-"Entities": [
-  "entityData": {
-     tbd
-  }
+{
+    "Entities": [
+        {
+            "EntityType": "di-aoic-courts-case-status",
+            "EntityId": "case_status_record",
+            "LinkEntity": true,
+            "EntityData": {
+                "county": "dupage",
+                "statusdate": "02/20/2023",
+                "casestatusrowid": "2023-dupage-traffic-vendorname-5710"
+            }
+        }
+    ]
+}
 ```
 ##### Notes
 [1] Must be present for certification
