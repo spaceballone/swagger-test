@@ -1,6 +1,7 @@
 ---
 title: Overview
 noindex: true
+layout: chromeless
 ---
 # ![logo](https://www.tylertech.com/Portals/0/Logo-NavBar.jpg?ver=Js0wL8bzpXBsBHn_bv-Kjg%3d%3d) Tyler Data Pipeline Certification 
 These instructions and resources are intended to walk through
@@ -18,7 +19,7 @@ Each Vendor should submit all available data elements and
 specifically include all pipeline critical elements noted in the
 Pipeline Critical Elements section below. The submission is
 considered acceptable if no validation errors are triggered and
-the required data elements contain a value suitable for its
+the required data elements contai*n* a value suitable for its
 respective datatype. **Certification will occur by program per
 county.**
 
@@ -57,7 +58,7 @@ Note: this command will provide a bearer token that is valid for 60 minutes.
 ```
 curl https://tyler-alliance-system-dev.auth.us-east-1.amazoncognito.com/oauth2/token -X POST -H "Content-Type: application/x-www-form-urlencoded" --user YOUR_CLIENT_ID:YOUR_CLIENT_SECRET -d "grant_type=client_credentials"
 ```
-Please refer to the [API documentation](http://aoic-api.s3-website-us-west-2.amazonaws.com/) for more information.
+Please refer to the [API documentation](api) for more information.
 
 ## Step 2: Submit Messages to the Pipeline API
 ### Build the message
@@ -81,7 +82,7 @@ An example message might look like
               "sexperceived": "Male",
               "pretrialbackgroundid": "2023-cook-asdf-tyl-9152",
               "county": "cook"
-           },
+           }
         }
       ],
       "EventType": "di-aoic-new-record-event"
@@ -189,7 +190,6 @@ In addition to the Data Verification Prerequisites, the following elements must 
         {
             "EntityType": "di-aoic-pretrial-violations",
             "EntityId": "violations_record",
-            "LinkEntity": true,
             "EntityData": {
                 "name": "Dale Bell",
                 "localid": 9152,
@@ -233,7 +233,6 @@ record:
         {
             "EntityType": "di-aoic-probation-individual-background",
             "EntityId": "individual_background_record",
-            "LinkEntity": true,
             "EntityData": {
                 "name": "John Smith",
                 "localid": 6726,
@@ -264,6 +263,7 @@ following elements must be included in every PSC record:
 * dateofbirth [1]
 * sexperceived [1]
 * pscbackgroundid [2]
+
 ##### Example
 ```json
 {
@@ -271,7 +271,6 @@ following elements must be included in every PSC record:
         {
             "EntityType": "di-aoic-problem-solving-courts-screening",
             "EntityId": "screening_record",
-            "LinkEntity": true,
             "EntityData": {
                 "name": "Jane Doe",
                 "localid": 2667,
@@ -298,6 +297,7 @@ following elements must be included in every Courts record:
 * county
 * statusdate
 * casestatusrowid [1]
+
 ##### Example
 ```json
 {
@@ -305,7 +305,6 @@ following elements must be included in every Courts record:
         {
             "EntityType": "di-aoic-courts-case-status",
             "EntityId": "case_status_record",
-            "LinkEntity": true,
             "EntityData": {
                 "county": "dupage",
                 "statusdate": "02/20/2023",
@@ -320,7 +319,7 @@ following elements must be included in every Courts record:
 
 ## FAQ 
 1. Where can I find more information about the API?
-   2. Please refer to the [API documentation](http://aoic-api.s3-website-us-west-2.amazonaws.com/) for more information.
+   2. Please refer to the [API documentation](api) for more information.
 2. What happens if I get a SUCCESS response but receive an
 error message for data validation?
    * If there is an error in your submission, you’ll receive an
@@ -391,17 +390,3 @@ resolve your question as quickly and efficiently as possible:
   * Describe your question or issue 
   * Share relevant context about the issue, including links,
   screenshots and specific steps taken
-
-## Todos on this page
-[x] Update the JSON objects in the examples section
-
-[x] Finalize the row id
-
-[x] Look at the row id from a security model perspective. Can I as a vendor accidentially (or purposefully manipulate someone elses data?)? I think that the answer right now is "Yes!"
-
-[ ] Put it on dev.socrata.com (?)
-
-[ ] Finalize the county stuff
-
-[x] Remove information from the message that's not needed. 
-
