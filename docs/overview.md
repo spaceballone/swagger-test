@@ -89,11 +89,7 @@ An example message might look like
       ],
       "EventType": "di-aoic-new-record-event"
     }
-  ],
-  "PartnerId": "1000",
-  "ResolveMappings": true,
-  "TriggeredBy": "jane.doe@example.com",
-  "ValidateEnvelope": true
+  ]
 }
 ```
 Details for each attribute of the `Envelope` are:
@@ -147,8 +143,7 @@ These should be passed as attributes in the object. For example
 ##### Notes on the entity data object
 There are a couple of critical items to watch out for when building the entityData object:
 * **Data Elements** - Each entity **must** include the required elements listed in the [vendor folder](https://tylertech.sharepoint.com/sites/Client/DI/AOIC/Program%201%20%203%20Prepare%20Solution/Forms/AllItems.aspx?RootFolder=%2Fsites%2FClient%2FDI%2FAOIC%2FProgram%201%20%203%20Prepare%20Solution%2FVendor%20docs%2FData%20Elements%20%2D%20ALL&FolderCTID=0x012000E4E5E251D4298743B4D89B00DBBF4D85&View=%7B0F3FBEB1%2DB9A9%2D4E2E%2D957E%2D9E4144F8F6F9%7D), in the format specified. Failure to include these elements, or to format them in the right way could result in certification failure
-* **RowID** - Each object has a unique rowID. The RowID **must** follow a specific format: `4 digit year-County-Case Type-Vendor ID-Unique Number`. For example`2023-cook-criminalfelony-tyl-1234`
-
+* **RowID** - The rowID is used to allow the vendor the maintain (modify, update, delete) the data after it's been submitted. This is a unique identifier for the object in the local source system. Each object **must** have a unique rowID.  
 
 
 ### Send the message
@@ -364,11 +359,13 @@ resolve your question as quickly and efficiently as possible:
 ## Todos on this page
 [ ] Update the JSON objects in the examples section
 
-[ ] Finalize the row id
+[x] Finalize the row id
 
-[ ] Look at the row id from a security model perspective. Can I as a vendor accidentially (or purposefully manipulate someone elses data?)? I think that the answer right now is "Yes!"
+[x] Look at the row id from a security model perspective. Can I as a vendor accidentially (or purposefully manipulate someone elses data?)? I think that the answer right now is "Yes!"
 
 [ ] Put it on dev.socrata.com (?)
 
 [ ] Finalize the county stuff
+
+[x] Remove information from the message that's not needed. 
 
